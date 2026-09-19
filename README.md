@@ -129,7 +129,12 @@ Terraform has compared your real infrastructure against your configuration and
 found no differences, so no changes are needed.
 angelysofiapg@cloudshell:~/PRACTICA-3-RED (nube-practica-1-507220)$ 
 ```
-
+**Comando escrito: terraform output**
+```
+red = "pinoavila-vpc"ell:~/PRACTICA-3-RED (nube-practica-1-507220)$ terraform output
+subred_publica = "https://www.googleapis.com/compute/v1/projects/nube-practica-1-507220/regions/us-central1/subnetworks/pinoavila-sub-publica"
+angelysofiapg@cloudshell:~/PRACTICA-3-RED (nube-practica-1-507220)$ 
+```
 
 
 ## 4. Decisiones libres justificadas
