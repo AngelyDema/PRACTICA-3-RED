@@ -204,11 +204,323 @@ angelysofiapg@pinoavila-app:~$
 **Evidencia 4.1 y 4.2 (firewall y capture del sitio)**
 Se encuentran en la carpeta "evidencias".
 
+### Evidencia 5: 
+
+**Comando escrito: terraform destroy**
+```
+angelysofiapg@cloudshell:~/PRACTICA-3-RED (nube-practica-1-507220)$ terraform destroy
+google_compute_network.vpc: Refreshing state... [id=projects/nube-practica-1-507220/global/networks/pinoavila-vpc]
+google_compute_firewall.app_http: Refreshing state... [id=projects/nube-practica-1-507220/global/firewalls/pinoavila-permitir-http]
+google_compute_subnetwork.publica: Refreshing state... [id=projects/nube-practica-1-507220/regions/us-central1/subnetworks/pinoavila-sub-publica]
+google_compute_firewall.ssh_iap: Refreshing state... [id=projects/nube-practica-1-507220/global/firewalls/pinoavila-permitir-ssh-iap]
+google_compute_instance.app: Refreshing state... [id=projects/nube-practica-1-507220/zones/us-central1-a/instances/pinoavila-app]
+
+Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:
+  - destroy
+
+Terraform will perform the following actions:
+
+  # google_compute_firewall.app_http will be destroyed
+  - resource "google_compute_firewall" "app_http" {
+      - creation_timestamp      = "2026-09-18T21:40:33.290-07:00" -> null
+      - deletion_policy         = "DELETE" -> null
+      - destination_ranges      = [] -> null
+      - direction               = "INGRESS" -> null
+      - disabled                = false -> null
+      - id                      = "projects/nube-practica-1-507220/global/firewalls/pinoavila-permitir-http" -> null
+      - name                    = "pinoavila-permitir-http" -> null
+      - network                 = "https://www.googleapis.com/compute/v1/projects/nube-practica-1-507220/global/networks/pinoavila-vpc" -> null
+      - priority                = 1000 -> null
+      - project                 = "nube-practica-1-507220" -> null
+      - self_link               = "https://www.googleapis.com/compute/v1/projects/nube-practica-1-507220/global/firewalls/pinoavila-permitir-http" -> null
+      - source_ranges           = [
+          - "0.0.0.0/0",
+        ] -> null
+      - source_service_accounts = [] -> null
+      - source_tags             = [] -> null
+      - target_service_accounts = [] -> null
+      - target_tags             = [
+          - "servicio-web",
+        ] -> null
+
+      - allow {
+          - ports    = [
+              - "80",
+            ] -> null
+          - protocol = "tcp" -> null
+        }
+    }
+
+  # google_compute_firewall.ssh_iap will be destroyed
+  - resource "google_compute_firewall" "ssh_iap" {
+      - creation_timestamp      = "2026-09-18T21:40:32.651-07:00" -> null
+      - deletion_policy         = "DELETE" -> null
+      - destination_ranges      = [] -> null
+      - direction               = "INGRESS" -> null
+      - disabled                = false -> null
+      - id                      = "projects/nube-practica-1-507220/global/firewalls/pinoavila-permitir-ssh-iap" -> null
+      - name                    = "pinoavila-permitir-ssh-iap" -> null
+      - network                 = "https://www.googleapis.com/compute/v1/projects/nube-practica-1-507220/global/networks/pinoavila-vpc" -> null
+      - priority                = 1000 -> null
+      - project                 = "nube-practica-1-507220" -> null
+      - self_link               = "https://www.googleapis.com/compute/v1/projects/nube-practica-1-507220/global/firewalls/pinoavila-permitir-ssh-iap" -> null
+      - source_ranges           = [
+          - "35.235.240.0/20",
+        ] -> null
+      - source_service_accounts = [] -> null
+      - source_tags             = [] -> null
+      - target_service_accounts = [] -> null
+      - target_tags             = [
+          - "servicio-web",
+        ] -> null
+
+      - allow {
+          - ports    = [
+              - "22",
+            ] -> null
+          - protocol = "tcp" -> null
+        }
+    }
+
+  # google_compute_instance.app will be destroyed
+  - resource "google_compute_instance" "app" {
+      - can_ip_forward          = false -> null
+      - cpu_platform            = "AMD Rome" -> null
+      - creation_timestamp      = "2026-09-18T21:02:07.936-07:00" -> null
+      - current_status          = "RUNNING" -> null
+      - deletion_policy         = "DELETE" -> null
+      - deletion_protection     = false -> null
+      - effective_labels        = {
+          - "goog-terraform-provisioned" = "true"
+        } -> null
+      - enable_display          = false -> null
+      - id                      = "projects/nube-practica-1-507220/zones/us-central1-a/instances/pinoavila-app" -> null
+      - instance_id             = "7098409224690186192" -> null
+      - label_fingerprint       = "vezUS-42LLM=" -> null
+      - labels                  = {} -> null
+      - machine_type            = "e2-micro" -> null
+      - metadata                = {} -> null
+      - metadata_fingerprint    = "9juv6rCcTyI=" -> null
+      - metadata_startup_script = <<-EOT
+            #!/bin/bash
+            apt-get update -y
+            apt-get install -y nginx
+            INTERNA=$(curl -s -H "Metadata-Flavor: Google" \
+              http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip)
+            cat > /var/www/html/index.html <<HTML
+            <h1>1152315-1152490</h1>
+            <p>Servidor de aplicación. IP interna: $INTERNA</p>
+            HTML
+        EOT -> null
+      - name                    = "pinoavila-app" -> null
+      - project                 = "nube-practica-1-507220" -> null
+      - resource_policies       = [] -> null
+      - self_link               = "https://www.googleapis.com/compute/v1/projects/nube-practica-1-507220/zones/us-central1-a/instances/pinoavila-app" -> null
+      - tags                    = [
+          - "servicio-web",
+        ] -> null
+      - tags_fingerprint        = "aesi9iE0ehc=" -> null
+      - terraform_labels        = {
+          - "goog-terraform-provisioned" = "true"
+        } -> null
+      - zone                    = "us-central1-a" -> null
+
+      - boot_disk {
+          - auto_delete       = true -> null
+          - device_name       = "persistent-disk-0" -> null
+          - force_attach      = false -> null
+          - guest_os_features = [
+              - "UEFI_COMPATIBLE",
+              - "VIRTIO_SCSI_MULTIQUEUE",
+              - "GVNIC",
+              - "SEV_CAPABLE",
+              - "SEV_LIVE_MIGRATABLE_V2",
+            ] -> null
+          - mode              = "READ_WRITE" -> null
+          - source            = "https://www.googleapis.com/compute/v1/projects/nube-practica-1-507220/zones/us-central1-a/disks/pinoavila-app" -> null
+
+          - initialize_params {
+              - architecture                = "X86_64" -> null
+              - enable_confidential_compute = false -> null
+              - image                       = "https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-12-bookworm-v20260908" -> null
+              - labels                      = {} -> null
+              - provisioned_iops            = 0 -> null
+              - provisioned_throughput      = 0 -> null
+              - replica_zones               = [] -> null
+              - resource_manager_tags       = {} -> null
+              - resource_policies           = [] -> null
+              - size                        = 10 -> null
+              - type                        = "pd-standard" -> null
+            }
+        }
+
+      - network_interface {
+          - internal_ipv6_prefix_length = 0 -> null
+          - name                        = "nic0" -> null
+          - network                     = "https://www.googleapis.com/compute/v1/projects/nube-practica-1-507220/global/networks/pinoavila-vpc" -> null
+          - network_ip                  = "10.10.1.2" -> null
+          - queue_count                 = 0 -> null
+          - stack_type                  = "IPV4_ONLY" -> null
+          - subnetwork                  = "https://www.googleapis.com/compute/v1/projects/nube-practica-1-507220/regions/us-central1/subnetworks/pinoavila-sub-publica" -> null
+          - subnetwork_project          = "nube-practica-1-507220" -> null
+          - vlan                        = 0 -> null
+
+          - access_config {
+              - nat_ip       = "34.56.124.28" -> null
+              - network_tier = "PREMIUM" -> null
+            }
+        }
+
+      - scheduling {
+          - automatic_restart          = true -> null
+          - availability_domain        = 0 -> null
+          - host_error_timeout_seconds = 0 -> null
+          - min_node_cpus              = 0 -> null
+          - on_host_maintenance        = "MIGRATE" -> null
+          - preemptible                = false -> null
+          - provisioning_model         = "STANDARD" -> null
+        }
+
+      - shielded_instance_config {
+          - enable_integrity_monitoring = true -> null
+          - enable_secure_boot          = false -> null
+          - enable_vtpm                 = true -> null
+        }
+    }
+
+  # google_compute_network.vpc will be destroyed
+  - resource "google_compute_network" "vpc" {
+      - auto_create_subnetworks                   = false -> null
+      - bgp_always_compare_med                    = false -> null
+      - bgp_best_path_selection_mode              = "LEGACY" -> null
+      - delete_bgp_always_compare_med             = false -> null
+      - delete_default_routes_on_create           = false -> null
+      - deletion_policy                           = "DELETE" -> null
+      - enable_ula_internal_ipv6                  = false -> null
+      - id                                        = "projects/nube-practica-1-507220/global/networks/pinoavila-vpc" -> null
+      - mtu                                       = 0 -> null
+      - name                                      = "pinoavila-vpc" -> null
+      - network_firewall_policy_enforcement_order = "AFTER_CLASSIC_FIREWALL" -> null
+      - network_id                                = "8833539663965741925" -> null
+      - numeric_id                                = "8833539663965741925" -> null
+      - project                                   = "nube-practica-1-507220" -> null
+      - routing_mode                              = "REGIONAL" -> null
+      - self_link                                 = "https://www.googleapis.com/compute/v1/projects/nube-practica-1-507220/global/networks/pinoavila-vpc" -> null
+    }
+
+  # google_compute_subnetwork.publica will be destroyed
+  - resource "google_compute_subnetwork" "publica" {
+      - allow_subnet_cidr_routes_overlap = false -> null
+      - creation_timestamp               = "2026-09-18T17:55:50.060-07:00" -> null
+      - deletion_policy                  = "DELETE" -> null
+      - gateway_address                  = "10.10.1.1" -> null
+      - id                               = "projects/nube-practica-1-507220/regions/us-central1/subnetworks/pinoavila-sub-publica" -> null
+      - ip_cidr_range                    = "10.10.1.0/24" -> null
+      - name                             = "pinoavila-sub-publica" -> null
+      - network                          = "https://www.googleapis.com/compute/v1/projects/nube-practica-1-507220/global/networks/pinoavila-vpc" -> null
+      - private_ip_google_access         = false -> null
+      - private_ipv6_google_access       = "DISABLE_GOOGLE_ACCESS" -> null
+      - project                          = "nube-practica-1-507220" -> null
+      - purpose                          = "PRIVATE" -> null
+      - region                           = "us-central1" -> null
+      - self_link                        = "https://www.googleapis.com/compute/v1/projects/nube-practica-1-507220/regions/us-central1/subnetworks/pinoavila-sub-publica" -> null
+      - stack_type                       = "IPV4_ONLY" -> null
+      - subnetwork_id                    = 8799317995911407000 -> null
+    }
+
+Plan: 0 to add, 0 to change, 5 to destroy.
+
+Changes to Outputs:
+  - ip_publica     = "34.56.124.28" -> null
+  - red            = "pinoavila-vpc" -> null
+  - subred_publica = "https://www.googleapis.com/compute/v1/projects/nube-practica-1-507220/regions/us-central1/subnetworks/pinoavila-sub-publica" -> null
+
+Do you really want to destroy all resources?
+  Terraform will destroy all your managed infrastructure, as shown above.
+  There is no undo. Only 'yes' will be accepted to confirm.
+
+  Enter a value: yes
+
+google_compute_firewall.ssh_iap: Destroying... [id=projects/nube-practica-1-507220/global/firewalls/pinoavila-permitir-ssh-iap]
+google_compute_firewall.app_http: Destroying... [id=projects/nube-practica-1-507220/global/firewalls/pinoavila-permitir-http]
+google_compute_instance.app: Destroying... [id=projects/nube-practica-1-507220/zones/us-central1-a/instances/pinoavila-app]
+google_compute_firewall.app_http: Still destroying... [id=projects/nube-practica-1-507220/global/firewalls/pinoavila-permitir-http, 10s elapsed]
+google_compute_firewall.ssh_iap: Still destroying... [id=projects/nube-practica-1-507220/global/firewalls/pinoavila-permitir-ssh-iap, 10s elapsed]
+google_compute_instance.app: Still destroying... [id=projects/nube-practica-1-507220/zones/us-central1-a/instances/pinoavila-app, 10s elapsed]
+google_compute_firewall.ssh_iap: Destruction complete after 11s
+google_compute_firewall.app_http: Destruction complete after 11s
+google_compute_instance.app: Still destroying... [id=projects/nube-practica-1-507220/zones/us-central1-a/instances/pinoavila-app, 20s elapsed]
+google_compute_instance.app: Destruction complete after 21s
+google_compute_subnetwork.publica: Destroying... [id=projects/nube-practica-1-507220/regions/us-central1/subnetworks/pinoavila-sub-publica]
+google_compute_subnetwork.publica: Still destroying... [id=projects/nube-practica-1-507220/regions...ral1/subnetworks/pinoavila-sub-publica, 10s elapsed]
+google_compute_subnetwork.publica: Destruction complete after 11s
+google_compute_network.vpc: Destroying... [id=projects/nube-practica-1-507220/global/networks/pinoavila-vpc]
+google_compute_network.vpc: Still destroying... [id=projects/nube-practica-1-507220/global/networks/pinoavila-vpc, 10s elapsed]
+google_compute_network.vpc: Still destroying... [id=projects/nube-practica-1-507220/global/networks/pinoavila-vpc, 20s elapsed]
+google_compute_network.vpc: Still destroying... [id=projects/nube-practica-1-507220/global/networks/pinoavila-vpc, 30s elapsed]
+google_compute_network.vpc: Destruction complete after 31s
+
+Destroy complete! Resources: 5 destroyed.
+angelysofiapg@cloudshell:~/PRACTICA-3-RED (nube-practica-1-507220)$ 
+```
+**comando escrito: gcloud compute instances list**
+```
+angelysofiapg@cloudshell:~/PRACTICA-3-RED (nube-practica-1-507220)$ gcloud compute instances list
+Listed 0 items.
+```
+
+**Comando escrito: gcloud compute networks list**
+```
+angelysofiapg@cloudshell:~/PRACTICA-3-RED (nube-practica-1-507220)$ gcloud compute networks list
+NAME: default
+SUBNET_MODE: AUTO
+BGP_ROUTING_MODE: REGIONAL
+IPV4_RANGE: 
+GATEWAY_IPV4: 
+INTERNAL_IPV6_RANGE: 
+```
+
+**Comando escrito: terraform apply**
+```
+ Enter a value: yes
+
+google_compute_network.vpc: Creating...
+google_compute_network.vpc: Still creating... [10s elapsed]
+google_compute_network.vpc: Still creating... [20s elapsed]
+google_compute_network.vpc: Still creating... [30s elapsed]
+google_compute_network.vpc: Creation complete after 32s [id=projects/nube-practica-1-507220/global/networks/pinoavila-vpc]
+google_compute_firewall.ssh_iap: Creating...
+google_compute_subnetwork.publica: Creating...
+google_compute_firewall.app_http: Creating...
+google_compute_subnetwork.publica: Still creating... [10s elapsed]
+google_compute_firewall.ssh_iap: Still creating... [10s elapsed]
+google_compute_firewall.app_http: Still creating... [10s elapsed]
+google_compute_firewall.ssh_iap: Creation complete after 11s [id=projects/nube-practica-1-507220/global/firewalls/pinoavila-permitir-ssh-iap]
+google_compute_firewall.app_http: Creation complete after 11s [id=projects/nube-practica-1-507220/global/firewalls/pinoavila-permitir-http]
+google_compute_subnetwork.publica: Creation complete after 11s [id=projects/nube-practica-1-507220/regions/us-central1/subnetworks/pinoavila-sub-publica]
+google_compute_instance.app: Creating...
+google_compute_instance.app: Still creating... [10s elapsed]
+google_compute_instance.app: Creation complete after 18s [id=projects/nube-practica-1-507220/zones/us-central1-a/instances/pinoavila-app]
+
+Apply complete! Resources: 5 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+ip_publica = "34.46.138.226"
+red = "pinoavila-vpc"
+subred_publica = "https://www.googleapis.com/compute/v1/projects/nube-practica-1-507220/regions/us-central1/subnetworks/pinoavila-sub-publica"
+angelysofiapg@cloudshell:~/PRACTICA-3-RED (nube-practica-1-507220)$ 
+```
+**Nueva ip: "34.46.138.226"**
+**Ip vieja: "34.56.124.28"**
+
+*Hay dos evidencias fotográficas de esto en la carpeta evidencias*
+
 ## 4. Decisiones libres justificadas
 
 ### 4.1 Sobre la máquina: 
-Aunque el uso en esta práctica es pequeño, y más o menos teníamos entendido el tipo de máquina que teníamos que escoger quisimos hacer la trazabilidad de comparar las diferentes  máquinas y poder decir cuál era adecuada para nuestro trabajo. Google cloud tiene docs que informas tanto para la zona como para máquinas: https://docs.cloud.google.com/compute/docs/machine-resource?hl=es-419
-. En ese sitio leimos las diferentes máquinas que tienen, y terminamos escogiendo de la serie E2 la e2-micro. 
+Aunque el uso en esta práctica es pequeño, y más o menos teníamos entendido el tipo de máquina que teníamos que escoger quisimos hacer la trazabilidad de comparar las diferentes  máquinas y poder decir cuál era adecuada para nuestro trabajo. Google cloud tiene docs que informan tanto para la zona como para máquinas: https://docs.cloud.google.com/compute/docs/machine-resource?hl=es-419
+. En ese sitio leímos las diferentes máquinas que tienen, y terminamos escogiendo de la serie E2 la e2-micro. 
 
 *Citando del sitio: "Las series E2 y N1 contienen tipos de máquina con núcleo compartido. Estos tipos de máquinas comparten un núcleo físico, que puede ser un método rentable para ejecutar apps pequeñas que no necesitan muchos recursos"*
 
@@ -216,7 +528,7 @@ Otra razón para escoger e2-micro es que estamos trabajando con créditos gratui
 
 ### 4.2. Sobre la zona
 
-Por el lado de la zona, nosotros decidimos trabajar primero basado en la región en la que estamos, ya que una región diferente a la zona podría generar fallos en al apply, ya que la teoría dice que una zona es una "área aislada" dentro de una región. Entonces, basado en eso pusimos el comando: 
+Por el lado de la zona, nosotros decidimos trabajar primero basado en la región en la que estamos, ya que una región diferente a la zona podría generar fallos en el apply, ya que la teoría dice que una zona es una "área aislada" dentro de una región. Entonces, basado en eso pusimos el comando: 
 
 ```
 gcloud compute zones list --filter="region:us-central1"
