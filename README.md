@@ -5,8 +5,8 @@
 ## 3. Evidencias
 
 ### Evidencia 0: 
-Comando escrito: terraform version
-salida:
+**Comando escrito: terraform version**
+**Salida:**
 
 ```
 Terraform v1.5.7
@@ -17,8 +17,8 @@ is 1.16.3. You can update by downloading from https://www.terraform.io/downloads
 ```
 *La versión dice que está desactualizada pero la dejamos así porque para la practica la versión de Terraform no es relevante (o por lo menos no hay una parte que exija cierta versión)*
 
-Comando escrito: gcloud config list
-Salida:
+**Comando escrito: gcloud config list**
+**Salida:**
 ```
 angelysofiapg@cloudshell:~/PRACTICA-3-RED (nube-practica-1-507220)$  gcloud config list
 [accessibility]
