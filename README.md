@@ -209,6 +209,9 @@ False
 ```
 Esto si nos da true nos permite determinar si una ip sobrepone otra.
 
+### 4.4 sobre el puerto y el source_ranges
+En el hueco se coloca el puerto 80 porque en esta regla definimos quiénes pueden ver nuestra página web, para acceder a http por defecto es el puerto 80. Además, como queremos que "cualquiera de internet" pueda entrar a nuestra página web ponemos: "0.0.0.0/0" el /0 no fija ningún bit, por lo que permite a todas las direcciones. 
+
 ## 5. Preguntas respondidas 
 
 
