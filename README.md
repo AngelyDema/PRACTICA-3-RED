@@ -114,7 +114,7 @@ google_compute_subnetwork.publica: Creating...
 google_compute_subnetwork.publica: Still creating... [10s elapsed]
 google_compute_subnetwork.publica: Creation complete after 11s [id=projects/nube-practica-1-507220/regions/us-central1/subnetworks/pinoavila-sub-publica]
 ```
-## Evidencia 2: 
+### Evidencia 2: 
 **Comando escrito: terraform plan**
 
 ```
@@ -135,7 +135,9 @@ red = "pinoavila-vpc"ell:~/PRACTICA-3-RED (nube-practica-1-507220)$ terraform ou
 subred_publica = "https://www.googleapis.com/compute/v1/projects/nube-practica-1-507220/regions/us-central1/subnetworks/pinoavila-sub-publica"
 angelysofiapg@cloudshell:~/PRACTICA-3-RED (nube-practica-1-507220)$ 
 ```
+### Evidencia 3: 
 
+Las imágenes de evidencia están en la carpeta *"evidencias"* como *"evidencia 3" y "evidencia 3.1"*
 
 ## 4. Decisiones libres justificadas
 
