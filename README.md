@@ -139,6 +139,71 @@ angelysofiapg@cloudshell:~/PRACTICA-3-RED (nube-practica-1-507220)$
 
 Las imágenes de evidencia están en la carpeta *"evidencias"* como *"evidencia 3" y "evidencia 3.1"*
 
+### Evidencia 4: 
+
+**Comando escrito: gcloud compute ssh pinoavila-app --tunnel-through-iap**
+```
+angelysofiapg@cloudshell:~/PRACTICA-3-RED (nube-practica-1-507220)$  gcloud compute ssh pinoavila-app --tunnel-through-iap
+WARNING: The private SSH key file for gcloud does not exist.
+WARNING: The public SSH key file for gcloud does not exist.
+WARNING: You do not have an SSH key for gcloud.
+WARNING: SSH keygen will be executed to generate a key.
+This tool needs to create the directory [/home/angelysofiapg/.ssh] before being able to generate SSH keys.
+
+Do you want to continue (Y/n)?  y
+
+Generating public/private rsa key pair.
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /home/angelysofiapg/.ssh/google_compute_engine
+Your public key has been saved in /home/angelysofiapg/.ssh/google_compute_engine.pub
+The key fingerprint is:
+SHA256:AqGY2ohqgHHWish7WL9c2UI+HiTaFwg8FnLfhY3JBLk angelysofiapg@cs-1096672498634-default
+The key's randomart image is:
++---[RSA 3072]----+
+| . o..=.=.       |
+| o+ooo.=..       |
+|+ +=o...         |
+|*B..oE.          |
+|O.o. o.+S        |
+|o + + =.+        |
+|.+ o o O .       |
+|. . . = +        |
+|     o .         |
++----[SHA256]-----+
+Did you mean zone [us-east1-c] for instance: [pinoavila-app] (Y/n)?  n
+
+No zone specified. Using zone [us-central1-a] for instance: [pinoavila-app].
+Updating project ssh metadata...workingUpdated [https://www.googleapis.com/compute/v1/projects/nube-practica-1-507220].                                                 
+Updating project ssh metadata...done.                                                                                                                                   
+Waiting for SSH key to propagate.
+WARNING: 
+
+To increase the performance of the tunnel, consider installing NumPy. For instructions,
+please see https://cloud.google.com/iap/docs/using-tcp-forwarding#increasing_the_tcp_upload_bandwidth
+
+Warning: Permanently added 'compute.7098409224690186192' (ED25519) to the list of known hosts.
+Enter passphrase for key '/home/angelysofiapg/.ssh/google_compute_engine': 
+WARNING: 
+
+To increase the performance of the tunnel, consider installing NumPy. For instructions,
+please see https://cloud.google.com/iap/docs/using-tcp-forwarding#increasing_the_tcp_upload_bandwidth
+
+Enter passphrase for key '/home/angelysofiapg/.ssh/google_compute_engine': 
+Linux pinoavila-app 6.1.0-53-cloud-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.187-1 (2026-09-07) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+angelysofiapg@pinoavila-app:~$
+```
+
+**Evidencia 4.1 y 4.2 (firewall y capture del sitio)**
+Se encuentran en la carpeta "evidencias".
+
 ## 4. Decisiones libres justificadas
 
 ### 4.1 Sobre la máquina: 
