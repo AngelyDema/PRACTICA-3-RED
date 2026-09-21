@@ -2,6 +2,36 @@
 ## 1. Identificación del equipo: Angely Sofia Pino 1152315, Jhan Ávila Torres 1152490
 ### 1.1. ID del proyecto: nube-practica-1-507220
 ## 2. Diagrama
+
+```mermaid
+flowchart LR
+    Internet((Internet))
+    Dispositivo["Tu dispositivo, fuera del campus"]
+
+    subgraph VPC["pinoavila-vpc (red propia, sin subredes automaticas)"]
+        direction TB
+
+        subgraph SubPub["pinoavila-sub-publica · 10.10.1.0/24 · us-central1"]
+            App["pinoavila-app<br/>tag: servicio-web<br/>nginx :80<br/>IP interna + IP publica efimera"]
+        end
+
+        subgraph SubPriv["pinoavila-sub-privada · 10.11.1.0/24 · us-central1"]
+            Datos["pinoavila-datos<br/>tag: servicio-datos<br/>nginx :80<br/>solo IP interna"]
+        end
+
+        Router["Cloud Router<br/>pinoavila-router"]
+        NAT["Cloud NAT<br/>pinoavila-nat"]
+    end
+
+    Dispositivo -- "80/tcp, origen 0.0.0.0/0<br/>regla: permitir-http" --> App
+    Dispositivo -- "22/tcp via IAP, origen 35.235.240.0/20<br/>regla: permitir-ssh-iap" --> App
+    App -- "80/tcp, origen = tag servicio-web<br/>regla: permitir-datos-interno" --> Datos
+    Datos --> Router --> NAT --> Internet
+    Internet -. "sin access_config: no hay por donde entrar" .-> Datos
+```
+
+Básicamente lo que hicimos fue esto: la app se puede alcanzar por dos puertas nada más (el 80 para el navegador y el 22 solo desde el rango de IAP), las dos controladas por la etiqueta `servicio-web`. La máquina de datos no tiene ninguna dirección a la que uno de afuera le pueda hablar, así que para instalar sus paquetes sale por el NAT, y solo le recibe algo a la máquina que tenga la etiqueta `servicio-web`.
+
 ## 3. Evidencias
 
 ### Evidencia 0: 
@@ -516,9 +546,134 @@ angelysofiapg@cloudshell:~/PRACTICA-3-RED (nube-practica-1-507220)$
 
 *Hay dos evidencias fotográficas de esto en la carpeta evidencias*
 
-## 4. Decisiones libres justificadas
+### Evidencia 6: 
 
-### 4.1 Sobre la máquina: 
+**Reto de la semana: la máquina que nadie puede alcanzar**
+
+**Comando escrito: terraform apply /**
+**Salida:**
+```
+jhan_4_fran_t@cloudshell:~/PRACTICA-3-RED (nube-practica-1-507220)$ terraform apply
+
+[... el plan completo, con los 10 recursos a crear: google_compute_network.vpc,
+google_compute_subnetwork.publica, google_compute_subnetwork.privada,
+google_compute_instance.app, google_compute_instance.datos,
+google_compute_firewall.app_http, google_compute_firewall.ssh_iap,
+google_compute_firewall.datos_interno, google_compute_router.router y
+google_compute_router_nat.nat. Las capturas completas del plan están en
+"evidencias" como "Evidencia 6.1.1" a "Evidencia 6.1.8" ...]
+
+Plan: 10 to add, 0 to change, 0 to destroy.
+
+Do you want to perform these actions?
+  Enter a value: yes
+
+google_compute_network.vpc: Creating...
+google_compute_network.vpc: Creation complete after 21s [id=projects/nube-practica-1-507220/global/networks/pinoavila-vpc]
+google_compute_firewall.app_http: Creating...
+google_compute_firewall.ssh_iap: Creating...
+google_compute_router.router: Creating...
+google_compute_subnetwork.privada: Creating...
+google_compute_subnetwork.publica: Creating...
+google_compute_firewall.datos_interno: Creating...
+google_compute_subnetwork.privada: Creation complete after 11s [id=.../pinoavila-sub-privada]
+google_compute_instance.datos: Creating...
+google_compute_subnetwork.publica: Creation complete after 12s [id=.../pinoavila-sub-publica]
+google_compute_router.router: Creation complete after 12s [id=.../pinoavila-router]
+google_compute_router_nat.nat: Creating...
+google_compute_firewall.ssh_iap: Creation complete after 12s
+google_compute_firewall.app_http: Creation complete after 22s
+google_compute_firewall.datos_interno: Creation complete after 22s
+google_compute_router_nat.nat: Creation complete after 12s [id=.../pinoavila-nat]
+google_compute_instance.datos: Creation complete after 27s [id=.../pinoavila-datos]
+google_compute_instance.app: Creating...
+google_compute_instance.app: Creation complete after 28s [id=.../pinoavila-app]
+
+Apply complete! Resources: 10 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+ip_interna_datos = "10.11.1.2"
+ip_publica = "35.202.57.254"
+red = "pinoavila-vpc"
+subred_publica = "https://www.googleapis.com/compute/v1/projects/nube-practica-1-507220/regions/us-central1/subnetworks/pinoavila-sub-publica"
+```
+Algo que vale la pena señalar de este log: `google_compute_instance.datos` terminó de crearse ("Creation complete after 27s") **antes** de que `google_compute_instance.app` siquiera empezara ("Creating..."). Eso no lo pusimos nosotros a mano, es la dependencia real: el `templatefile()` del script de la app necesita la IP interna de `datos`, así que Terraform no tuvo más remedio que crear primero una y después la otra.
+
+**Comando escrito: gcloud compute instances describe pinoavila-datos --zone=us-central1-a --format="get(networkInterfaces[0].accessConfigs)" /**
+**Salida:**
+```
+jhan_4_fran_t@cloudshell:~/PRACTICA-3-RED (nube-practica-1-507220)$ gcloud compute instances describe pinoavila-datos --zone=us-central1-a \
+  --format="get(networkInterfaces[0].accessConfigs)"
+
+jhan_4_fran_t@cloudshell:~/PRACTICA-3-RED (nube-practica-1-507220)$ 
+```
+No imprimió nada. Esa es la prueba de que `pinoavila-datos` no tiene ningún `accessConfig`, o sea, ninguna IP pública.
+
+**Prueba del aislamiento, entrando por SSH con IAP a `pinoavila-app` y desde ahí probando contra la IP interna de `pinoavila-datos`:**
+```
+jhan_4_fran_t@cloudshell:~/PRACTICA-3-RED (nube-practica-1-507220)$ gcloud compute ssh pinoavila-app --zone=us-central1-a --tunnel-through-iap
+[...]
+jhan_4_fran_t@pinoavila-app:~$ curl -m 8 http://10.11.1.2:22
+curl -m 8 http://10.11.1.2/dato.txt
+curl: (28) Connection timed out after 8001 milliseconds
+dato-servido-desde-la-maquina-privada-1152315-1152490
+```
+El primer `curl`, contra el puerto 22 (que la regla `datos_interno` no permite), se quedó esperando hasta agotar el tiempo: el paquete lo descarta el cortafuegos en silencio, no hay ningún servicio que lo rechace. El segundo, contra el puerto 80 (el único que sí permite la regla, y solo desde la etiqueta `servicio-web`), respondió con el texto exacto que sirve `arranque_datos.sh`.
+
+**El dato en la página:**
+Entrando a `http://35.202.57.254` desde el celular, con datos móviles y no con el wifi del campus, la página mostró:
+
+> 1152315-1152490
+> Servidor de aplicación. IP interna: 10.10.1.2
+> Dato recibido de la máquina de datos (10.11.x.x, sin IP pública): dato-servido-desde-la-maquina-privada-1152315-1152490
+
+*Las imágenes de esta evidencia están en la carpeta "evidencias": "Evidencia 6.1.1" a "Evidencia 6.1.8" (el plan y la creación completos), "Evidencia 6.2" (el `accessConfigs` vacío), "Evidencia 6.3" (la sesión SSH con los dos `curl`) y "Evidencia 6.4" (la página final desde el celular).*
+
+## 4. Comandos ejecutados
+
+Aquí dejamos solo los comandos, sin la salida (la salida completa ya está en cada evidencia arriba):
+
+```
+# Fase 0
+terraform version
+gcloud config list
+gcloud services enable compute.googleapis.com
+git clone https://github.com/<usuario>/practica-3-red.git
+
+# Fase 1
+terraform init
+terraform plan
+terraform apply
+
+# Fase 2
+terraform plan
+terraform apply
+terraform output
+
+# Fase 3 y 4
+terraform apply
+curl -m 8 http://<IP-PUBLICA>
+gcloud compute ssh pinoavila-app --tunnel-through-iap
+
+# Fase 5
+terraform destroy
+gcloud compute instances list
+gcloud compute networks list
+terraform apply
+
+# Fase 6
+terraform plan
+terraform apply
+gcloud compute instances describe pinoavila-datos --zone=us-central1-a --format="get(networkInterfaces[0].accessConfigs)"
+gcloud compute ssh pinoavila-app --zone=us-central1-a --tunnel-through-iap
+curl -m 8 http://10.11.1.2:22
+curl -m 8 http://10.11.1.2/dato.txt
+```
+
+## 5. Decisiones libres justificadas
+
+### 5.1 Sobre la máquina: 
 Aunque el uso en esta práctica es pequeño, y más o menos teníamos entendido el tipo de máquina que teníamos que escoger quisimos hacer la trazabilidad de comparar las diferentes  máquinas y poder decir cuál era adecuada para nuestro trabajo. Google cloud tiene docs que informan tanto para la zona como para máquinas: https://docs.cloud.google.com/compute/docs/machine-resource?hl=es-419
 . En ese sitio leímos las diferentes máquinas que tienen, y terminamos escogiendo de la serie E2 la e2-micro. 
 
@@ -526,7 +681,7 @@ Aunque el uso en esta práctica es pequeño, y más o menos teníamos entendido 
 
 Otra razón para escoger e2-micro es que estamos trabajando con créditos gratuitos, haciendo mini poryectos que no van a tener mucho tráfico y probablemente para este proceso de la practica no se usará tanta ram. Aunque es cierto que f1-micro tiene menos ram google cloud ya tiene en su capa gratuita a e2-micro. No hay razón de dinero de por medio para elegir f1-micro sobre e2-micro. 
 
-### 4.2. Sobre la zona
+### 5.2. Sobre la zona
 
 Por el lado de la zona, nosotros decidimos trabajar primero basado en la región en la que estamos, ya que una región diferente a la zona podría generar fallos en el apply, ya que la teoría dice que una zona es una "área aislada" dentro de una región. Entonces, basado en eso pusimos el comando: 
 
@@ -572,7 +727,7 @@ DEPRECATED:
 ```
 Aquí mostrams con us-central1-a pero tanto b,c y f daban el mismo resultado. Utilizamos entonces la zona **us-central1-a**. No encontramos información comparativa sobre la disponibilidad de estas zonas, o otros criterios para elegir una sobre otra. 
 
-### 4.3 Sobre la cdri privada
+### 5.3 Sobre la cdri privada
 Esta era la parte más difícil (porque no recordabamos), para esto nos tocó repasar teoría. En donde después propusimos la red privada: 10.11.1.0/24
 
 **¿Por qué ese valor?**
@@ -586,9 +741,31 @@ False
 ```
 Esto si nos da true nos permite determinar si una ip sobrepone otra.
 
-### 4.4 sobre el puerto y el source_ranges
+### 5.4 sobre el puerto y el source_ranges
 En el hueco se coloca el puerto 80 porque en esta regla definimos quiénes pueden ver nuestra página web, para acceder a http por defecto es el puerto 80. Además, como queremos que "cualquiera de internet" pueda entrar a nuestra página web ponemos: "0.0.0.0/0" el /0 no fija ningún bit, por lo que permite a todas las direcciones. 
 
-## 5. Preguntas respondidas 
+## 6. Preguntas respondidas
+
+**1. Si le quitas la etiqueta de red a la máquina de aplicación y aplicas, ¿qué deja de funcionar exactamente, y por qué la regla de cortafuegos sigue existiendo?**
+
+Deja de funcionar todo el acceso de afuera: ni el navegador entra por el 80 ni el `gcloud compute ssh --tunnel-through-iap` entra por el 22, porque las dos reglas (`permitir-http` y `permitir-ssh-iap`) usan `target_tags = ["servicio-web"]` para saber a qué máquina aplicarse, y si le quitamos la etiqueta a `pinoavila-app` esa máquina ya no encaja en ninguna de las dos. Pero la regla no se borra ni deja de existir: sigue estando ahí, en la VPC, con su mismo origen y su mismo puerto, solo que ya no tiene a quién aplicarse. Es la misma trampa que ya nos habían advertido con `tags` vs `labels`: la regla vive del lado de la red y la etiqueta del lado de la máquina, y lo único que las conecta es que coincidan.
+
+**2. ¿Por qué el `plan` de la fase 2 no propuso ningún cambio, si el código era distinto? ¿Qué habrías tenido que cambiar para que sí propusiera recrear un recurso?**
+
+Porque en la fase 2 no tocamos ningún valor real, solo movimos lo que ya estaba escrito a mano hacia variables con el mismo valor de por defecto, y agregamos `outputs.tf`. Terraform no compara un archivo contra el otro, compara la infraestructura que ya existe contra lo que el código describe en ese momento, y como al final la descripción daba exactamente lo mismo (mismo nombre, mismo rango, misma región), no había nada que cambiar. Para que sí propusiera recrear algo habríamos tenido que cambiar el valor de un atributo que el proveedor no deja modificar sin recrear el recurso, por ejemplo el `ip_cidr_range` de la subred o el `name` de la VPC; esos son los que el `plan` marca como reemplazo forzado.
+
+**3. Con la red completa encendida, ¿cuánto costaría un mes?**
+
+Buscando en el catálogo de precios de Google Cloud para `us-central1` (sin contar la capa gratuita ni descuentos, y suponiendo las dos máquinas prendidas el mes completo):
+
+- Las dos instancias `e2-micro` (`pinoavila-app` y `pinoavila-datos`): normalmente caen dentro de la capa gratuita de GCP si es la única e2-micro que corre en el proyecto; si no, cada una ronda los US$6-7 al mes.
+- Los dos discos de arranque de 10 GB `pd-standard`: casi nada, menos de US$1 entre los dos.
+- La IP pública efímera de `pinoavila-app`: no cobra aparte mientras esté asignada a una instancia encendida.
+- El Cloud Router: no tiene costo propio.
+- El Cloud NAT: este fue el que más nos sorprendió. Cobra por hora de gateway (más o menos US$1-1,50 al mes solo por existir) más una tarifa por cada GB que procese, aunque la máquina de datos casi no genere tráfico.
+
+Sumando todo, el mes quedaría en algo entre US$2 y US$16 dependiendo de si las e2-micro entran o no en la capa gratuita. Lo que más nos llamó la atención es justo el NAT: es el único recurso de toda la lista que cobra por estar desplegado y no por lo que hace, así que dejarlo prendido un fin de semana sin usarlo sí se nota en la factura. Por eso tiene sentido que la práctica insista tanto en el `destroy` al terminar de trabajar.
+
+*(Esto es un cálculo aproximado con los precios públicos que encontramos, no lo sacamos de la calculadora de precios oficial con los datos exactos del proyecto.)*
 
 
