@@ -11,3 +11,8 @@ output "subred_publica" {
 output "ip_publica" {
   value = google_compute_instance.app.network_interface[0].access_config[0].nat_ip
 }
+
+output "ip_interna_datos" {
+  value       = google_compute_instance.datos.network_interface[0].network_ip
+  description = "IP interna de la máquina de datos. No tiene IP pública: esta es la única forma de dirigirse a ella."
+}
